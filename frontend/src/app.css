@@ -1,0 +1,102 @@
+@import 'tailwindcss';
+
+/* ── Static scale: existing color palettes ──────────────────────────── */
+@theme {
+	/* Primary palette anchored at brand navy #001D49 (900)
+	   Scale computed from hsl(218°, 100%, 14%) outward toward sky blue */
+	--color-primary-50:  #eaf2ff;   /* near-white azure tint */
+	--color-primary-100: #c8dcfc;   /* pale periwinkle */
+	--color-primary-200: #93bbf8;   /* cornflower light */
+	--color-primary-300: #5a98f4;   /* sky cornflower */
+	--color-primary-400: #2e72e8;   /* bright interactive blue */
+	--color-primary-500: #1758c8;   /* royal blue — primary actions */
+	--color-primary-600: #0d449c;   /* deep royal — hover state */
+	--color-primary-700: #08337d;   /* dark admiral */
+	--color-primary-800: #022166;   /* near-navy */
+	--color-primary-900: #001D49;   /* brand navy */
+
+	--color-danger-50:  #fff0f0;
+	--color-danger-500: #e63535;
+	--color-danger-600: #cc1f1f;
+	--color-danger-700: #a81a1a;
+
+	--color-success-50:  #edfaf3;
+	--color-success-500: #18b75a;
+	--color-success-600: #0f9a49;
+
+	--color-warning-50:  #fff8e6;
+	--color-warning-500: #f0960a;
+
+	/* Leaderboard medal tones — richer than before */
+	--color-gold:   #e8a000;   /* warm burnished gold */
+	--color-silver: #8e9aac;   /* cool steel silver */
+	--color-bronze: #c26b1e;   /* earthy bronze */
+}
+
+/* ── Semantic tokens: change with .dark on <html> ───────────────────── */
+@layer base {
+	:root {
+		/* Light mode: warm ivory/parchment — like a premium game board */
+		--color-bg:             #f5f3ee;   /* warm parchment */
+		--color-surface:        #fdfcf8;   /* warm white */
+		--color-surface-raised: #ebe7dc;   /* warm gray */
+		--color-border:         #d3cdc0;   /* warm border */
+		--color-text-primary:   #0a1628;   /* deep blue-black */
+		--color-text-secondary: #576272;   /* blue-slate */
+		--color-text-disabled:  #b4aea4;   /* warm gray muted */
+		--color-overlay:        rgb(10 22 40 / 0.45);
+	}
+
+	.dark {
+		/* Dark mode: midnight ocean — pure navy immersion */
+		--color-bg:             #000b1e;   /* deepest ocean */
+		--color-surface:        #001030;   /* deep panel */
+		--color-surface-raised: #001D49;   /* brand navy — elevated */
+		--color-border:         #0b3572;   /* distinct navy border */
+		--color-text-primary:   #eef4ff;   /* cool white */
+		--color-text-secondary: #7baae4;   /* steel blue */
+		--color-text-disabled:  #1c3a62;   /* muted navy */
+		--color-overlay:        rgb(0 0 0 / 0.65);
+	}
+}
+
+/* ── Tailwind utilities backed by the semantic tokens ───────────────── */
+@theme inline {
+	--color-bg:             var(--color-bg);
+	--color-surface:        var(--color-surface);
+	--color-surface-raised: var(--color-surface-raised);
+	--color-border:         var(--color-border);
+	--color-text-primary:   var(--color-text-primary);
+	--color-text-secondary: var(--color-text-secondary);
+	--color-text-disabled:  var(--color-text-disabled);
+}
+
+/* ── Global focus ring (T11.9) ──────────────────────────────────────── */
+@layer base {
+	:focus-visible {
+		outline: 2px solid var(--color-primary, #1758c8);
+		outline-offset: 2px;
+	}
+
+	/* Default border color for all elements */
+	*,
+	::before,
+	::after {
+		border-color: var(--color-border);
+	}
+
+	/* Themed native form controls */
+	select,
+	textarea,
+	input:not([type='checkbox']):not([type='radio']):not([type='range']) {
+		background-color: var(--color-surface);
+		color: var(--color-text-primary);
+	}
+
+	select:disabled,
+	textarea:disabled,
+	input:disabled {
+		background-color: var(--color-surface-raised);
+		color: var(--color-text-secondary);
+	}
+}
