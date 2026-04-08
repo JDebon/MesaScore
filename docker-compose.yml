@@ -59,7 +59,7 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
     ports:
-      - "8080:80"
+      - "8880:80"
       - "8443:443"
     depends_on:
       - backend
