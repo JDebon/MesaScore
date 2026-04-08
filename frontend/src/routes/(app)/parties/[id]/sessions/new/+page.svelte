@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 	import Button from '$components/ui/Button.svelte';
 	import Input from '$components/ui/Input.svelte';
 	import Avatar from '$components/ui/Avatar.svelte';
@@ -21,25 +22,71 @@
 	const user = $derived(getUser());
 	const isAdmin = $derived(user?.id === layoutData.party.admin.id);
 
-	let step = $state(1);
+	// ── SessionStorage persistence ──────────────────────────────────────
+	const storageKey = `mesascore_new_session_${layoutData.party.id}`;
+
+	const savedState = browser
+		? (() => {
+				try {
+					const s = sessionStorage.getItem(storageKey);
+					return s ? JSON.parse(s) : null;
+				} catch {
+					return null;
+				}
+			})()
+		: null;
+
+	// ── Form state (restored from sessionStorage if available) ───────────
+	let step = $state<number>(savedState?.step ?? 1);
 	let loadingData = $state(true);
 	let saving = $state(false);
 
-	// Data
+	// Data loaded from API
 	let availableGames = $state<AvailableGame[]>([]);
 	let members = $state<PartyMember[]>([]);
 
-	// Form
-	let gameId = $state('');
-	let sessionType = $state<'competitive' | 'team' | 'cooperative' | 'score'>('competitive');
-	let playedAt = $state(new Date().toISOString().split('T')[0]);
-	let durationMinutes = $state('');
-	let broughtByUserId = $state('');
-	let notes = $state('');
-	let selectedMembers = $state<Set<string>>(new Set());
-	let participants = $state<(ParticipantInput & { display_name: string })[]>([]);
+	// Form fields
+	let gameId = $state<string>(savedState?.gameId ?? '');
+	let sessionType = $state<'competitive' | 'team' | 'cooperative' | 'score'>(
+		savedState?.sessionType ?? 'competitive'
+	);
+	let playedAt = $state<string>(savedState?.playedAt ?? new Date().toISOString().split('T')[0]);
+	let durationMinutes = $state<string>(savedState?.durationMinutes ?? '');
+	let broughtByUserId = $state<string>(savedState?.broughtByUserId ?? '');
+	let notes = $state<string>(savedState?.notes ?? '');
+	let selectedMembers = $state<Set<string>>(new Set(savedState?.selectedMembers ?? []));
+	let participants = $state<(ParticipantInput & { display_name: string })[]>(
+		savedState?.participants ?? []
+	);
+
+	// Per-step errors shown inline
+	let step2Error = $state('');
+	let submitError = $state('');
 
 	const selectedGame = $derived(availableGames.find((g) => g.id === gameId));
+
+	// ── Persist state to sessionStorage on every meaningful change ───────
+	$effect(() => {
+		if (!browser || loadingData) return;
+		try {
+			sessionStorage.setItem(
+				storageKey,
+				JSON.stringify({
+					step,
+					gameId,
+					sessionType,
+					playedAt,
+					durationMinutes,
+					broughtByUserId,
+					notes,
+					selectedMembers: [...selectedMembers],
+					participants
+				})
+			);
+		} catch {
+			// Ignore storage errors (private mode, quota exceeded)
+		}
+	});
 
 	onMount(async () => {
 		if (!isAdmin) {
@@ -66,13 +113,15 @@
 		if (next.has(id)) next.delete(id);
 		else next.add(id);
 		selectedMembers = next;
+		step2Error = '';
 	}
 
 	function goToStep3() {
 		if (selectedMembers.size < 2) {
-			addToast('Select at least 2 participants', 'error');
+			step2Error = 'Select at least 2 participants.';
 			return;
 		}
+		step2Error = '';
 		participants = [...selectedMembers].map((id, i) => {
 			const m = members.find((m) => m.id === id)!;
 			return {
@@ -81,7 +130,7 @@
 				team_name: null,
 				rank: sessionType === 'cooperative' ? null : i + 1,
 				score: null,
-				result: sessionType === 'cooperative' ? null : null
+				result: null
 			};
 		});
 		step = 3;
@@ -105,6 +154,7 @@
 
 	async function submit() {
 		saving = true;
+		submitError = '';
 		try {
 			const res = await sessionsApi.create(layoutData.party.id, {
 				game_id: gameId,
@@ -121,13 +171,15 @@
 					result
 				}))
 			});
+			// Clear persisted draft on success
+			try { sessionStorage.removeItem(storageKey); } catch { /* ignore */ }
 			addToast('Session logged!', 'success');
 			goto(`/parties/${layoutData.party.id}/sessions/${res.id}`);
 		} catch (e) {
 			if (e instanceof ApiError && e.fields) {
-				addToast(Object.values(e.fields).join(', '), 'error');
+				submitError = Object.values(e.fields).join(' ');
 			} else {
-				addToast(e instanceof ApiError ? e.message : 'Failed to log session', 'error');
+				submitError = e instanceof ApiError ? e.message : 'Failed to log session. Please try again.';
 			}
 		} finally {
 			saving = false;
@@ -223,6 +275,11 @@
 						</button>
 					{/each}
 				</div>
+
+				{#if step2Error}
+					<p class="mt-3 text-sm text-danger-600">{step2Error}</p>
+				{/if}
+
 				<div class="mt-4 flex gap-3">
 					<Button variant="secondary" onclick={() => (step = 1)}>Back</Button>
 					<Button class="flex-1" onclick={goToStep3}>Next ({selectedMembers.size} selected)</Button>
@@ -312,6 +369,12 @@
 						</div>
 					{/each}
 				</div>
+
+				{#if submitError}
+					<div class="rounded-lg bg-danger-50 px-3 py-2 text-sm text-danger-600 dark:bg-danger-600/20 dark:text-danger-400">
+						{submitError}
+					</div>
+				{/if}
 
 				<div class="flex gap-3">
 					<Button variant="secondary" onclick={() => (step = 3)}>Back</Button>

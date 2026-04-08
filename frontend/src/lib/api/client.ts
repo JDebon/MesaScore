@@ -22,11 +22,25 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
 		headers['Authorization'] = `Bearer ${token}`;
 	}
 
-	const res = await fetch(`${PUBLIC_API_URL}${path}`, {
-		method,
-		headers,
-		body: body ? JSON.stringify(body) : undefined
-	});
+	const controller = new AbortController();
+	const timeoutId = setTimeout(() => controller.abort(), 15_000);
+
+	let res: Response;
+	try {
+		res = await fetch(`${PUBLIC_API_URL}${path}`, {
+			method,
+			headers,
+			body: body ? JSON.stringify(body) : undefined,
+			signal: controller.signal
+		});
+	} catch (fetchErr) {
+		clearTimeout(timeoutId);
+		if ((fetchErr as DOMException)?.name === 'AbortError') {
+			throw new ApiError(0, 'Request timed out. Please try again.');
+		}
+		throw fetchErr;
+	}
+	clearTimeout(timeoutId);
 
 	const newToken = res.headers.get('X-New-Token');
 	if (newToken) {

@@ -152,14 +152,13 @@ Acceptance criteria:
 
 ## F3 — Game Catalog & Collections
 
-### F3.1 Browse the game catalog
-**As any user, I want to browse all games in the catalog.**
+### F3.1 Browse my collection
+**As any user, I want to browse my own game collection.**
 
 Acceptance criteria:
-- Shows all games with cover image, name, player count range, BGG rating.
-- Filterable by name (text search).
-- Shows whether the game is in the user's own collection.
-- Sorted alphabetically by default. Can also sort by rating or session count.
+- Shows only games in the user's own collection, with cover image, name, and date added.
+- Filterable by name (client-side text search).
+- Links to each game's detail page.
 
 ### F3.2 Game detail page
 **As any user, I want to see a game's details.**

@@ -23,7 +23,7 @@
 		</a>
 
 		<div class="flex items-center gap-3">
-			<a href="/games" class="text-sm font-medium text-text-secondary hover:text-text-primary">Games</a>
+			<a href="/games" class="text-sm font-medium text-text-secondary hover:text-text-primary">My Collection</a>
 
 			<ThemeToggle />
 

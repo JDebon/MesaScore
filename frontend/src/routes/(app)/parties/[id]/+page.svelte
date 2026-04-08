@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import Spinner from '$components/ui/Spinner.svelte';
 	import Avatar from '$components/ui/Avatar.svelte';
 	import EmptyState from '$components/ui/EmptyState.svelte';
+	import LoadState from '$components/ui/LoadState.svelte';
+	import Skeleton from '$components/ui/Skeleton.svelte';
 	import { partiesApi } from '$api/parties';
 	import { addToast } from '$stores/toast.svelte';
 	import { getUser } from '$stores/auth.svelte';
@@ -15,19 +16,24 @@
 	let { data: layoutData }: Props = $props();
 	let dashboard = $state<PartyDashboard | null>(null);
 	let loading = $state(true);
+	let loadError = $state(false);
 	const user = $derived(getUser());
 	const isAdmin = $derived(user?.id === layoutData.party.admin.id);
 
-	onMount(async () => {
+	async function loadData() {
+		loading = true;
+		loadError = false;
 		try {
 			dashboard = await partiesApi.dashboard(layoutData.party.id);
 		} catch (e) {
 			console.error('[party dashboard] Failed to load:', e);
-			addToast('Failed to load party dashboard', 'error');
+			loadError = true;
 		} finally {
 			loading = false;
 		}
-	});
+	}
+
+	onMount(loadData);
 
 	function formatDate(dateStr: string): string {
 		return new Date(dateStr).toLocaleDateString();
@@ -53,56 +59,90 @@
 	<title>{layoutData.party.name} - MesaScore</title>
 </svelte:head>
 
-{#if loading}
-	<div class="flex justify-center py-20">
-		<Spinner size="lg" />
-	</div>
-{:else if dashboard}
+<LoadState {loading} error={loadError} onretry={loadData}>
+	{#snippet skeleton()}
+		<!-- Stats strip -->
+		<div class="mb-6 grid grid-cols-3 gap-3">
+			{#each [1, 2, 3] as _}
+				<div class="rounded-lg bg-surface p-4 shadow-sm space-y-2">
+					<Skeleton class="h-7 w-12 mx-auto" />
+					<Skeleton class="h-3 w-16 mx-auto" />
+				</div>
+			{/each}
+		</div>
+		<!-- Leader card -->
+		<div class="mb-6 rounded-lg bg-surface p-4 shadow-sm flex items-center gap-3">
+			<Skeleton class="h-10 w-10 rounded-full" />
+			<div class="space-y-2 flex-1">
+				<Skeleton class="h-4 w-32" />
+				<Skeleton class="h-3 w-20" />
+			</div>
+		</div>
+		<!-- Activity chart -->
+		<div class="mb-6 rounded-lg bg-surface p-4 shadow-sm">
+			<Skeleton class="h-4 w-20 mb-3" />
+			<Skeleton class="h-20 w-full" />
+		</div>
+		<!-- Recent sessions -->
+		<Skeleton class="h-5 w-36 mb-3" />
+		<div class="space-y-2">
+			{#each [1, 2, 3] as _}
+				<div class="flex items-center gap-3 rounded-lg bg-surface p-3 shadow-sm">
+					<Skeleton class="h-10 w-10 rounded" />
+					<div class="flex-1 space-y-2">
+						<Skeleton class="h-4 w-40" />
+						<Skeleton class="h-3 w-28" />
+					</div>
+				</div>
+			{/each}
+		</div>
+	{/snippet}
+
 	<!-- Stats strip -->
 	<div class="mb-6 grid grid-cols-3 gap-3">
 		<div class="rounded-lg bg-surface p-4 text-center shadow-sm">
-			<p class="text-2xl font-bold text-text-primary">{dashboard.total_sessions}</p>
+			<p class="text-2xl font-bold text-text-primary">{dashboard!.total_sessions}</p>
 			<p class="text-xs text-text-secondary">Sessions</p>
 		</div>
 		<div class="rounded-lg bg-surface p-4 text-center shadow-sm">
-			<p class="text-2xl font-bold text-text-primary">{dashboard.total_unique_games}</p>
+			<p class="text-2xl font-bold text-text-primary">{dashboard!.total_unique_games}</p>
 			<p class="text-xs text-text-secondary">Games</p>
 		</div>
 		<div class="rounded-lg bg-surface p-4 text-center shadow-sm">
-			<p class="text-2xl font-bold text-text-primary">{dashboard.total_members}</p>
+			<p class="text-2xl font-bold text-text-primary">{dashboard!.total_members}</p>
 			<p class="text-xs text-text-secondary">Members</p>
 		</div>
 	</div>
 
 	<!-- Current leader -->
-	{#if dashboard.current_leader}
+	{#if dashboard!.current_leader}
 		<div class="mb-6 rounded-lg bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 p-4">
 			<p class="mb-2 text-xs font-medium text-primary-600 uppercase tracking-wide">Current Leader</p>
-			<a href="/parties/{layoutData.party.id}/users/{dashboard.current_leader.user.id}" class="flex items-center gap-3">
-				<Avatar url={dashboard.current_leader.user.avatar_url} name={dashboard.current_leader.user.display_name} size="md" />
+			<a href="/parties/{layoutData.party.id}/users/{dashboard!.current_leader.user.id}" class="flex items-center gap-3">
+				<Avatar url={dashboard!.current_leader.user.avatar_url} name={dashboard!.current_leader.user.display_name} size="md" />
 				<div>
-					<p class="font-semibold text-text-primary">{dashboard.current_leader.user.display_name}</p>
-					<p class="text-sm text-text-secondary">{dashboard.current_leader.wins} win{dashboard.current_leader.wins === 1 ? '' : 's'}</p>
+					<p class="font-semibold text-text-primary">{dashboard!.current_leader.user.display_name}</p>
+					<p class="text-sm text-text-secondary">{dashboard!.current_leader.wins} win{dashboard!.current_leader.wins === 1 ? '' : 's'}</p>
 				</div>
 			</a>
 		</div>
 	{/if}
 
 	<!-- Most played game -->
-	{#if dashboard.most_played_game}
+	{#if dashboard!.most_played_game}
 		<div class="mb-6 rounded-lg bg-surface p-4 shadow-sm">
 			<p class="mb-2 text-xs font-medium text-text-secondary uppercase tracking-wide">Most Played</p>
-			<a href="/games/{dashboard.most_played_game.id}?party_id={layoutData.party.id}" class="flex items-center gap-3">
-				{#if dashboard.most_played_game.cover_image_url}
-					<img src={dashboard.most_played_game.cover_image_url} alt="" class="h-12 w-12 rounded-lg object-cover" />
+			<a href="/games/{dashboard!.most_played_game.id}?party_id={layoutData.party.id}" class="flex items-center gap-3">
+				{#if dashboard!.most_played_game.cover_image_url}
+					<img src={dashboard!.most_played_game.cover_image_url} alt="" class="h-12 w-12 rounded-lg object-cover" />
 				{:else}
 					<div class="flex h-12 w-12 items-center justify-center rounded-lg bg-surface-raised text-text-secondary">
 						<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
 					</div>
 				{/if}
 				<div>
-					<p class="font-medium text-text-primary">{dashboard.most_played_game.name}</p>
-					<p class="text-sm text-text-secondary">{dashboard.most_played_game.session_count} session{dashboard.most_played_game.session_count === 1 ? '' : 's'}</p>
+					<p class="font-medium text-text-primary">{dashboard!.most_played_game.name}</p>
+					<p class="text-sm text-text-secondary">{dashboard!.most_played_game.session_count} session{dashboard!.most_played_game.session_count === 1 ? '' : 's'}</p>
 				</div>
 			</a>
 		</div>
@@ -136,11 +176,11 @@
 			<a href="/parties/{layoutData.party.id}/sessions" class="text-sm font-medium text-primary-600 hover:text-primary-700">View all</a>
 		</div>
 
-		{#if dashboard.recent_sessions.length === 0}
+		{#if dashboard!.recent_sessions.length === 0}
 			<EmptyState message={isAdmin ? 'No sessions yet. Log your first game!' : 'No sessions logged yet.'} />
 		{:else}
 			<div class="space-y-2">
-				{#each dashboard.recent_sessions as session}
+				{#each dashboard!.recent_sessions as session}
 					<a
 						href="/parties/{layoutData.party.id}/sessions/{session.id}"
 						class="flex items-center gap-3 rounded-lg bg-surface p-3 shadow-sm transition-shadow hover:shadow-md"
@@ -179,4 +219,4 @@
 			</svg>
 		</a>
 	{/if}
-{/if}
+</LoadState>

@@ -160,20 +160,5 @@
 				{/if}
 			</section>
 		{/if}
-
-		<!-- Owners -->
-		{#if game.owners.length > 0}
-			<section>
-				<h2 class="mb-3 text-lg font-semibold text-text-primary">Owners ({game.owners.length})</h2>
-				<div class="flex flex-wrap gap-3">
-					{#each game.owners as owner}
-						<a href="/users/{owner.id}" class="flex items-center gap-2 rounded-lg bg-surface p-2 shadow-sm hover:shadow-md">
-							<Avatar url={owner.avatar_url} name={owner.display_name} size="sm" />
-							<span class="text-sm font-medium text-text-primary">{owner.display_name}</span>
-						</a>
-					{/each}
-				</div>
-			</section>
-		{/if}
 	</div>
 {/if}

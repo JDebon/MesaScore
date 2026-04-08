@@ -13,6 +13,15 @@ services:
       timeout: 5s
       retries: 5
 
+  duckdns:
+    image: lscr.io/linuxserver/duckdns:latest
+    environment:
+      SUBDOMAINS: ${DUCKDNS_SUBDOMAIN}
+      TOKEN: ${DUCKDNS_TOKEN}
+      UPDATE_IP: ipv4
+      LOG_FILE: false
+    restart: unless-stopped
+
   mailpit:
     image: axllent/mailpit
     ports:
@@ -40,6 +49,7 @@ services:
     build: ./frontend
     environment:
       ORIGIN: ${BASE_URL:-http://localhost}
+      BACKEND_URL: http://backend:8080
     depends_on:
       - backend
 

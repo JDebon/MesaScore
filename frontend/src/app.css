@@ -1,5 +1,17 @@
 @import 'tailwindcss';
 
+/* ── Typography ─────────────────────────────────────────────────────── */
+@theme {
+	--font-display: 'Playfair Display', Georgia, serif;
+	--font-body:    'DM Sans', system-ui, sans-serif;
+}
+
+@layer base {
+	body {
+		font-family: var(--font-body);
+	}
+}
+
 /* ── Static scale: existing color palettes ──────────────────────────── */
 @theme {
 	/* Primary palette anchored at brand navy #001D49 (900)

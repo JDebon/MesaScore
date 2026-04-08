@@ -130,8 +130,8 @@
 - `POST /api/users/me/collection` — add game to own collection. Body: `{ game_id }`.
 - `DELETE /api/users/me/collection/:game_id` — remove game from own collection.
 
-### T4.4 — Frontend: game catalog page
-- `/games` — global catalog with search and sort.
+### T4.4 — Frontend: games pages
+- `/games` — user's own collection. Loads `GET /api/users/:id/collection`. Client-side name filter. No sort controls (collection items lack rating/session data).
 - `/games/:id` — game detail. Shows "Add to collection" / "Remove from collection" toggle. Shows all global owners.
 - `/games/new` — add game flow (BGG search → pre-fill form → submit).
 

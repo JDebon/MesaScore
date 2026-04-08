@@ -109,7 +109,7 @@ Deploy: `docker compose up -d --build`
 /login                     → login form
 /verify-email              → email verification handler
 /join/:code                → party join preview (works pre-login)
-/games                     → global game catalog
+/games                     → user's own game collection
 /games/:id                 → game detail
 /games/new                 → add game flow
 /users/:id                 → user profile + global stats

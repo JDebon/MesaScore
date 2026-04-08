@@ -13,7 +13,7 @@
 	const isAdmin = $derived(user?.id === data.party.admin.id);
 </script>
 
-<div class="lg:pl-56">
+<div>
 	<div class="mb-4 flex items-center justify-between">
 		<div class="flex items-center gap-3">
 			<a href="/" class="text-text-secondary hover:text-text-primary" aria-label="Back to dashboard">
