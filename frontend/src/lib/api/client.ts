@@ -1,5 +1,4 @@
 import { getToken, setToken, clearAuth } from '$stores/auth.svelte';
-import { PUBLIC_API_URL } from '$env/static/public';
 
 export class ApiError extends Error {
 	status: number;
@@ -27,7 +26,7 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
 
 	let res: Response;
 	try {
-		res = await fetch(`${PUBLIC_API_URL}${path}`, {
+		res = await fetch(path, {
 			method,
 			headers,
 			body: body ? JSON.stringify(body) : undefined,
