@@ -19,13 +19,13 @@
 
 	const user = $derived(getUser());
 
-	const greeting = $derived(() => {
+	const greeting = $derived.by(() => {
 		const h = new Date().getHours();
 		if (h < 5) return 'Good night';
 		if (h < 12) return 'Good morning';
 		if (h < 17) return 'Good afternoon';
 		return 'Good evening';
-	})();
+	});
 
 	const winRate = $derived(
 		data && data.global_stats.total_sessions > 0
