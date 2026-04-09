@@ -7,19 +7,18 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U mesascore"]
       interval: 5s
       timeout: 5s
       retries: 5
 
-  duckdns:
-    image: lscr.io/linuxserver/duckdns:latest
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run
     environment:
-      SUBDOMAINS: ${DUCKDNS_SUBDOMAIN}
-      TOKEN: ${DUCKDNS_TOKEN}
-      UPDATE_IP: ipv4
-      LOG_FILE: false
+      TUNNEL_TOKEN: ${CF_TUNNEL_TOKEN}
     restart: unless-stopped
 
   mailpit:
@@ -41,6 +40,7 @@ services:
       SMTP_FROM: ${SMTP_FROM:-MesaScore <noreply@mesascore.local>}
       ALLOWED_ORIGIN: ${ALLOWED_ORIGIN:-http://localhost:5173}
       BGG_API_TOKEN: ${BGG_API_TOKEN:-}
+    restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
@@ -50,6 +50,7 @@ services:
     environment:
       ORIGIN: ${BASE_URL:-http://localhost}
       BACKEND_URL: http://backend:8080
+    restart: unless-stopped
     depends_on:
       - backend
 
@@ -58,9 +59,7 @@ services:
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
-    ports:
-      - "8880:80"
-      - "8443:443"
+    restart: unless-stopped
     depends_on:
       - backend
       - frontend
