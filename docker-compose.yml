@@ -20,6 +20,7 @@ services:
     environment:
       TUNNEL_TOKEN: ${CF_TUNNEL_TOKEN}
     restart: unless-stopped
+    profiles: ["prod"]
 
   mailpit:
     image: axllent/mailpit
