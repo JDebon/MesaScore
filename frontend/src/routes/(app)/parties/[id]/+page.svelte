@@ -177,7 +177,7 @@
 		</div>
 
 		{#if dashboard!.recent_sessions.length === 0}
-			<EmptyState message={isAdmin ? 'No sessions yet. Log your first game!' : 'No sessions logged yet.'} />
+			<EmptyState message="No sessions yet. Log your first game!" />
 		{:else}
 			<div class="space-y-2">
 				{#each dashboard!.recent_sessions as session}
@@ -207,16 +207,14 @@
 		{/if}
 	</section>
 
-	<!-- Admin FAB for logging sessions -->
-	{#if isAdmin}
-		<a
-			href="/parties/{layoutData.party.id}/sessions/new"
-			class="fixed bottom-20 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary-600 text-white shadow-lg transition-transform hover:scale-105 hover:bg-primary-700 lg:bottom-8 lg:right-8"
-			aria-label="Log session"
-		>
-			<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-				<path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-			</svg>
-		</a>
-	{/if}
+	<!-- FAB for logging sessions (all members) -->
+	<a
+		href="/parties/{layoutData.party.id}/sessions/new"
+		class="fixed bottom-20 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary-600 text-white shadow-lg transition-transform hover:scale-105 hover:bg-primary-700 lg:bottom-8 lg:right-8"
+		aria-label="Log session"
+	>
+		<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+			<path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+		</svg>
+	</a>
 </LoadState>

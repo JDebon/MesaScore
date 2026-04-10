@@ -146,7 +146,7 @@
 ### T5.1 — Session endpoints
 - `GET /api/parties/:id/sessions` — list sessions for party. Auth: party member. Supports filters.
 - `GET /api/parties/:id/sessions/:session_id` — session detail. Auth: party member.
-- `POST /api/parties/:id/sessions` — create session. Auth: party admin.
+- `POST /api/parties/:id/sessions` — create session. Auth: party member.
 - `PATCH /api/parties/:id/sessions/:session_id` — edit session. Auth: party admin.
 - `DELETE /api/parties/:id/sessions/:session_id` — delete session. Auth: party admin.
 

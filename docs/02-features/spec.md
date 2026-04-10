@@ -202,8 +202,8 @@ Acceptance criteria:
 
 ## F4 — Session Logging
 
-### F4.1 Log a session (party admin only)
-**As a party admin, I want to log a game session for my party.**
+### F4.1 Log a session (any party member)
+**As a party member, I want to log a game session for my party.**
 
 Acceptance criteria:
 - Admin selects: game (from any participating member's collection), session type, date played, party members who participated.

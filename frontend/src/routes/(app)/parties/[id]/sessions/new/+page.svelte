@@ -89,10 +89,6 @@
 	});
 
 	onMount(async () => {
-		if (!isAdmin) {
-			goto(`/parties/${layoutData.party.id}`);
-			return;
-		}
 		try {
 			const [g, m] = await Promise.all([
 				gamesApi.availableForParty(layoutData.party.id),

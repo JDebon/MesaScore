@@ -125,7 +125,7 @@
 	{/snippet}
 
 	{#if sessions.length === 0}
-		<EmptyState message={isAdmin ? 'No sessions yet. Log your first game!' : 'No sessions logged yet.'} />
+		<EmptyState message="No sessions yet. Log your first game!" />
 	{:else}
 		<div class="space-y-2">
 			{#each sessions as session}

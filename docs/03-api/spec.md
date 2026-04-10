@@ -752,7 +752,7 @@ Errors: `404`. `403` if not a party member.
 ---
 
 #### `POST /api/parties/:id/sessions`
-Auth: party admin.
+Auth: party member.
 
 Request:
 ```json
