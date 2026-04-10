@@ -14,9 +14,6 @@ services:
       SMTP_PORT: "1025"
       BASE_URL: http://localhost
       ALLOWED_ORIGIN: http://localhost
-    depends_on:
-      mailpit:
-        condition: service_started
 
   frontend:
     environment:
