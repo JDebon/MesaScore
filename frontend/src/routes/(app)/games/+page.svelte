@@ -91,7 +91,7 @@
 					{/if}
 					<div class="min-w-0 flex-1">
 						<p class="truncate font-medium text-text-primary">{game.name}</p>
-						<p class="mt-1 text-xs text-text-secondary">Added {new Date(game.added_at).toLocaleDateString()}</p>
+						<p class="mt-1 text-xs text-text-secondary">Added {new Date(game.added_at).toLocaleDateString('en-GB')}</p>
 					</div>
 				</a>
 			{/each}
