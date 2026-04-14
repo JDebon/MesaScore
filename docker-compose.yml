@@ -1,3 +1,4 @@
+name: mesascore
 services:
   postgres:
     image: postgres:16
