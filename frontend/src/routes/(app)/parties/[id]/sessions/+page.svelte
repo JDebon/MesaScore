@@ -76,7 +76,7 @@
 	}
 
 	function formatDate(dateStr: string): string {
-		return new Date(dateStr).toLocaleDateString();
+		return new Date(dateStr).toLocaleDateString('en-GB');
 	}
 
 	const typeBadge: Record<string, 'default' | 'info' | 'success' | 'warning'> = {

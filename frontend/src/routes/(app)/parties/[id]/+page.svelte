@@ -36,7 +36,7 @@
 	onMount(loadData);
 
 	function formatDate(dateStr: string): string {
-		return new Date(dateStr).toLocaleDateString();
+		return new Date(dateStr).toLocaleDateString('en-GB');
 	}
 
 	// Build a 12-month window with counts, oldest to newest

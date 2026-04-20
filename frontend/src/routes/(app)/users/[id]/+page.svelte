@@ -93,7 +93,7 @@
 			{:else}
 				<h1 class="text-2xl font-bold text-text-primary">{profile.display_name}</h1>
 				<p class="text-text-secondary">@{profile.username}</p>
-				<p class="text-sm text-text-secondary">Member since {new Date(profile.created_at).toLocaleDateString()}</p>
+				<p class="text-sm text-text-secondary">Member since {new Date(profile.created_at).toLocaleDateString('en-GB')}</p>
 				{#if isOwnProfile}
 					<Button size="sm" variant="ghost" class="mt-2" onclick={startEdit}>Edit profile</Button>
 				{/if}
